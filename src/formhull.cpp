@@ -53,7 +53,7 @@ CFormHull::CFormHull(QWidget *parent)
  */
 void CFormHull::languageChange()
 {
-    setWindowTitle( tr("hull") );
+    setWindowTitle( tr("Hull") );
     actionViewDef->setText( tr("&Dimensions") );
 }
 

@@ -56,6 +56,9 @@ protected:
     /** A pointer to the sail definion */
     CSailDef *saildef;
 
+    /** Whether to use inches for display/input */
+    bool m_useInches;
+
 };
 
 #endif

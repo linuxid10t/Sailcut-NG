@@ -71,6 +71,25 @@
 <para>As of release 0.5.5, Sailcut CAD has support for internationalisation. Translations of the user interface in various languages are currently provided. On startup, Sailcut selects the language corresponding to your locale. You can use the <guisubmenu>Language</guisubmenu> submenu of the <guimenu>View</guimenu> menu to switch to another language. </para>
 
 </sect3>
+
+<sect3>
+<title> Units </title>
+
+<para>Sailcut CAD supports entering dimensions in either millimeters (default) or inches. Use the <guimenuitem>Preferences</guimenuitem> entry of the <guimenu>Edit</guimenu> menu to select Imperial (inches) or Metric (millimeters) units. </para>
+
+<para>When using Imperial units, the following input formats are supported:</para>
+
+<itemizedlist>
+<listitem><para>Decimal inches: <userinput>25.5</userinput></para></listitem>
+<listitem><para>Inches with fraction: <userinput>25 1/2</userinput></para></listitem>
+<listitem><para>Fraction only: <userinput>1/2</userinput></para></listitem>
+<listitem><para>Feet and inches: <userinput>5'3</userinput> or <userinput>5'3"</userinput></para></listitem>
+<listitem><para>Feet and inches with fraction: <userinput>5'3 1/2</userinput></para></listitem>
+</itemizedlist>
+
+<para>Note: Internal storage is always in millimeters. Sail area is always displayed in square meters.</para>
+
+</sect3>
 </sect2>
 
 </sect1>

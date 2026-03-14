@@ -101,9 +101,9 @@ void CFormBoat::add(const QString &newfile)
  */
 void CFormBoat::languageChange()
 {
-    setWindowTitle( tr("boat") );
+    setWindowTitle( tr("Boat") );
     menuAdd->setTitle( tr("&Add") );
-    actionAddFile->setText( tr("file") );
+    actionAddFile->setText( tr("File") );
 }
 
 

@@ -616,6 +616,17 @@ void CSailDoc::get
     {
         // we do not let this kill the program
     }
+    // Read useInches with backward compatibility
+    try
+    {
+        int temp;
+        get(e, temp, "useInches");
+        p.useInches = (temp != 0);
+    }
+    catch (doc_element_error const&)
+    {
+        p.useInches = false;
+    }
 }
 
 
@@ -1064,6 +1075,7 @@ void CSailDoc::put(QDomNode &parent, const CPrefs& p, const QString& name)
     put_vector(e, p.mruDocuments, "mruDocuments");
     put(e, p.mainWindowHeight, "mainWindowHeight");
     put(e, p.mainWindowWidth, "mainWindowWidth");
+    put(e, p.useInches ? 1 : 0, "useInches");
 }
 
 

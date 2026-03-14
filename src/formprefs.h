@@ -16,15 +16,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "prefs.h"
+#ifndef FORMPREFS_H
+#define FORMPREFS_H
 
+#include <QDialog>
+
+class QRadioButton;
 
 /**
- * Constructs a class holding the user's preferences.
+ * Dialog for editing application preferences.
  */
-CPrefs::CPrefs()
-    : mainWindowWidth(800)
-    , mainWindowHeight(600)
-    , useInches(false)
+class CFormPrefs : public QDialog
 {
-}
+    Q_OBJECT
+
+public:
+    CFormPrefs(QWidget *parent = nullptr);
+
+private slots:
+    void accept() override;
+
+private:
+    QRadioButton *radioImperial;
+    QRadioButton *radioMetric;
+};
+
+#endif

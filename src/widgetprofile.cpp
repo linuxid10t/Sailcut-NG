@@ -247,14 +247,14 @@ CWidgetProfile::CWidgetProfile( QWidget *parent, CProfile *ptr,
  */
 void CWidgetProfile::languageChange()
 {
-    lblLuff->setText( tr( "Luff shape" ) );
+    lblLuff->setText( tr( "Luff Shape" ) );
     lblDepth->setText( tr( "Depth" ) );
     lblPercent->setText( tr( "%" ) );
-    lblLeech->setText( tr( "Leech shape" ) );
+    lblLeech->setText( tr( "Leech Shape" ) );
     // ancillary data labels
-    lblLuffSlopeDegrees->setText( tr( "degrees" ) );
-    lblMaxPosCord->setText( tr( "cord") );
-    lblLeechSlopeDegrees->setText( tr( "degrees" ) );
+    lblLuffSlopeDegrees->setText( tr( "Degrees" ) );
+    lblMaxPosCord->setText( tr( "Chord") );
+    lblLeechSlopeDegrees->setText( tr( "Degrees" ) );
 }
 
 

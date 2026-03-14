@@ -52,7 +52,7 @@ CFormPanelGroup::CFormPanelGroup(QWidget *parent)
  */
 void CFormPanelGroup::languageChange()
 {
-    setWindowTitle( tr("panels") );
+    setWindowTitle( tr("Panels") );
 }
 
 

@@ -54,7 +54,7 @@ CFormRig::CFormRig(QWidget *parent)
  */
 void CFormRig::languageChange()
 {
-    setWindowTitle( tr("rig") );
+    setWindowTitle( tr("Rig") );
     actionViewDef->setText( tr("&Dimensions") );
 }
 

@@ -34,6 +34,7 @@ class CSailApp : public QApplication
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
     Q_PROPERTY(QStringList recentDocuments READ recentDocuments NOTIFY recentDocumentsChanged)
     Q_PROPERTY(QSize windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
+    Q_PROPERTY(bool useInches READ useInches WRITE setUseInches NOTIFY useInchesChanged)
 
 public:
     CSailApp(int &argc, char** argv);
@@ -51,6 +52,9 @@ public:
     QSize windowSize() const;
     void setWindowSize(const QSize &size);
 
+    bool useInches() const;
+    void setUseInches(bool useInches);
+
 public slots:
     void createBoat() const;
     void createHull() const;
@@ -63,6 +67,7 @@ signals:
     void languageChanged();
     void recentDocumentsChanged();
     void windowSizeChanged();
+    void useInchesChanged();
 
 private:
     void loadTranslation(const QString locale);

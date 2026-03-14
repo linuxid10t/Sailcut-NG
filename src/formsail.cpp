@@ -66,13 +66,13 @@ CFormSail::CFormSail(QWidget *parent)
  */
 void CFormSail::languageChange()
 {
-    setWindowTitle( tr("sail") );
+    setWindowTitle( tr("Sail") );
 
     // print submenu
     menuPrint->setTitle( tr("&Print") );
-    actionPrintData->setText( tr("data") );
-    actionPrintDwg->setText( tr("drawing") );
-    actionPrintDev->setText( tr("development") );
+    actionPrintData->setText( tr("Data") );
+    actionPrintDwg->setText( tr("Drawing") );
+    actionPrintDev->setText( tr("Development") );
 
     // export 3d submenu
     menuExport3d->setTitle( tr("E&xport 3D sail") );
@@ -99,7 +99,7 @@ void CFormSail::languageChange()
     actionViewPatch->setText( tr("&Patches") );
 
     // tabs
-    tabs->setTabText(tabs->panel.size()-1, tr("development"));
+    tabs->setTabText(tabs->panel.size()-1, tr("Development"));
 }
 
 

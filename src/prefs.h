@@ -40,6 +40,9 @@ public:
 
     /** The preferred language. */
     QString language;
+
+    /** Use inches for display/input (true = inches, false = mm) */
+    bool useInches;
 };
 
 #endif

@@ -25,7 +25,11 @@
 #include <QLineEdit>
 
 #include "formsaildef.h"
+#include "app.h"
 #include "sailcpp/sailworker.h"
+
+/** Conversion factor from inches to millimeters */
+static const double INCH_TO_MM = 25.4;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -46,40 +50,52 @@ CFormSailDef::CFormSailDef( QWidget* parent, CSailDef * sailptr )
     // the user clicks OK
     saildef = sailptr;
 
+    // Get unit preference
+    CSailApp *app = qobject_cast<CSailApp*>(qApp);
+    m_useInches = app->useInches();
+
+    // Helper lambda for displaying length values
+    auto displayLength = [this](double mmValue) -> QString {
+        if (m_useInches)
+            return QString::number(mmValue / INCH_TO_MM, 'f', 2);
+        else
+            return QString::number(mmValue);
+    };
+
     // Write all the sail data to the screen dimensions of sail.
     setSailCut( saildef->sailCut );
     setSailType( saildef->sailType );
 
     txtSailID->setText(QString::fromStdString(saildef->sailID));
 
-    txtLOA->setText( QString::number(saildef->LOA ) );
-    txtTriangBase->setText( QString::number(saildef->foreJ ) );
-    txtTriangHoist->setText( QString::number(saildef->foreI ) );
+    txtLOA->setText( displayLength(saildef->LOA) );
+    txtTriangBase->setText( displayLength(saildef->foreJ) );
+    txtTriangHoist->setText( displayLength(saildef->foreI) );
 
-    txtClothWidth->setText( QString::number( saildef->clothW ) );
-    txtSeamWidth->setText( QString::number( saildef->seamW ) );
-    txtLeechHemWidth->setText( QString::number( saildef->leechHemW ) );
-    txtFootHemWidth->setText( QString::number( saildef->footHemW ) );
-    txtHemsWidth->setText( QString::number( saildef->hemsW ) );
+    txtClothWidth->setText( displayLength(saildef->clothW) );
+    txtSeamWidth->setText( displayLength(saildef->seamW) );
+    txtLeechHemWidth->setText( displayLength(saildef->leechHemW) );
+    txtFootHemWidth->setText( displayLength(saildef->footHemW) );
+    txtHemsWidth->setText( displayLength(saildef->hemsW) );
 
-    txtTackDist->setText( QString::number( saildef->tackX ) );
-    txtTackHeight->setText( QString::number( saildef->tackY ) );
-    txtRake->setText( QString::number( saildef->rake ) );
+    txtTackDist->setText( displayLength(saildef->tackX) );
+    txtTackHeight->setText( displayLength(saildef->tackY) );
+    txtRake->setText( displayLength(saildef->rake) );
 
-    txtLuffLen->setText( QString::number( saildef->luffL ) );
-    txtLuffRound->setText( QString::number( saildef->luffR ) );
-    txtLuffRoundPos->setText( QString::number( saildef->luffRP ) );
+    txtLuffLen->setText( displayLength(saildef->luffL) );
+    txtLuffRound->setText( displayLength(saildef->luffR) );
+    txtLuffRoundPos->setText( QString::number(saildef->luffRP) );
 
-    txtGaffAngle->setText( QString::number( saildef->gaffDeg ) );
-    txtGaffLen->setText( QString::number( saildef->gaffL ) );
-    txtGaffRound->setText( QString::number( saildef->gaffR ) );
+    txtGaffAngle->setText( QString::number(saildef->gaffDeg) );
+    txtGaffLen->setText( displayLength(saildef->gaffL) );
+    txtGaffRound->setText( displayLength(saildef->gaffR) );
 
-    txtLeechLen->setText( QString::number( saildef->leechL ) );
-    txtLeechRound->setText( QString::number( saildef->leechR ) );
-    txtLeechRoundPos->setText( QString::number( saildef->leechRP ) );
+    txtLeechLen->setText( displayLength(saildef->leechL) );
+    txtLeechRound->setText( displayLength(saildef->leechR) );
+    txtLeechRoundPos->setText( QString::number(saildef->leechRP) );
 
-    txtFootLen->setText( QString::number( saildef->footL ) );
-    txtFootRound->setText( QString::number( saildef->footR ) );
+    txtFootLen->setText( displayLength(saildef->footL) );
+    txtFootRound->setText( displayLength(saildef->footR) );
 
     txtTopDepth->setText ( QString::number( saildef->mould.profile[2].getDepth()*100 ) );
     txtMidDepth->setText ( QString::number( saildef->mould.profile[1].getDepth()*100 ) );
@@ -93,6 +109,36 @@ CFormSailDef::CFormSailDef( QWidget* parent, CSailDef * sailptr )
     txtLuffGores->setText (QString::number( saildef->nbLuffGores ) );
 
     txtDihedral->setText ( QString::number( saildef->dihedralDeg ) );
+
+    // Update unit labels if using inches
+    if (m_useInches)
+    {
+        // Rig geometry group
+        lbmm_15->setText("in (or ft'in\")");
+        lbmm_2->setText("in (or ft'in\")");
+        lbmm->setText("in (or ft'in\")");
+        lbmm_4->setText("in (or ft'in\")");
+        lbmm_16->setText("in (or ft'in\")");
+        lbmm_3->setText("in (or ft'in\")");
+
+        // Sail dimensions group
+        lbmm_6->setText("in (or ft'in\")");
+        lbmm_11->setText("in (or ft'in\")");
+        lbmm_8->setText("in (or ft'in\")");
+        lbmm_12->setText("in (or ft'in\")");
+        lbmm_10->setText("in (or ft'in\")");
+        lbmm_5->setText("in (or ft'in\")");
+        lbmm_7->setText("in (or ft'in\")");
+        lbmm_9->setText("in (or ft'in\")");
+        lblmm13->setText("in (or ft'in\")");
+
+        // Cloth group
+        lbmm_60->setText("in (or ft'in\")");
+        lbmm_61->setText("in (or ft'in\")");
+        lbmm_62->setText("in (or ft'in\")");
+        lbmm_63->setText("in (or ft'in\")");
+        lbmm_64->setText("in (or ft'in\")");
+    }
 
     // Create button group for sail type.
     QButtonGroup *bgrpSailType = new QButtonGroup( this );
@@ -133,7 +179,21 @@ CFormSailDef::CFormSailDef( QWidget* parent, CSailDef * sailptr )
 void CFormSailDef::compute()
 {
     CSailWorker worker(*saildef);
-    lblSailArea->setText ( QString::number( worker.Area() ) );
+
+    // Conversion: 1 m² = 10.7639 ft²
+    static const double M2_TO_FT2 = 10.7639;
+
+    if (m_useInches)
+    {
+        lblSailArea->setText(QString::number(worker.Area() * M2_TO_FT2, 'f', 1));
+        lblm2_1->setText("ft²");
+    }
+    else
+    {
+        lblSailArea->setText(QString::number(worker.Area()));
+        lblm2_1->setText("m²");
+    }
+
     lblDiagonal->setText ( QString::number( worker.Diagonal() ) );
 }
 
@@ -333,6 +393,88 @@ bool CFormSailDef::check()
     palHi.setColor( QPalette::Text, Qt::red );    // too high value
     palRel.setColor( QPalette::Text, Qt::blue );  // related value to be checked
 
+    // Helper lambda for reading length values (converts from display units to mm)
+    // Supports fractional inch input like "25 1/2" for 25.5 inches
+    auto readLength = [this](const QLineEdit *edit) -> double {
+        QString text = edit->text().simplified();
+        double value = 0.0;
+
+        if (m_useInches)
+        {
+            // Helper to parse a number that might include a fraction
+            auto parseWithFraction = [](const QString& str) -> double {
+                double val = 0.0;
+                QStringList parts = str.split(' ', Qt::SkipEmptyParts);
+                if (parts.size() == 2)
+                {
+                    // Whole number + fraction
+                    val = parts[0].toDouble();
+                    QStringList fractionParts = parts[1].split('/');
+                    if (fractionParts.size() == 2)
+                    {
+                        double numerator = fractionParts[0].toDouble();
+                        double denominator = fractionParts[1].toDouble();
+                        if (denominator != 0)
+                            val += numerator / denominator;
+                    }
+                }
+                else if (parts.size() == 1)
+                {
+                    if (str.contains('/'))
+                    {
+                        QStringList fractionParts = str.split('/');
+                        if (fractionParts.size() == 2)
+                        {
+                            double numerator = fractionParts[0].toDouble();
+                            double denominator = fractionParts[1].toDouble();
+                            if (denominator != 0)
+                                val = numerator / denominator;
+                        }
+                    }
+                    else
+                    {
+                        val = str.toDouble();
+                    }
+                }
+                return val;
+            };
+
+            // Check for feet'inches format (e.g., "5'3\"" or "5'3 1/2")
+            if (text.contains('\''))
+            {
+                QStringList feetInches = text.split('\'');
+                if (feetInches.size() >= 1)
+                {
+                    // Feet part
+                    value = feetInches[0].toDouble() * 12.0;
+                    // Inches part (if present)
+                    if (feetInches.size() >= 2)
+                    {
+                        // Remove trailing " if present
+                        QString inchesStr = feetInches[1];
+                        if (inchesStr.endsWith('"'))
+                            inchesStr.chop(1);
+                        value += parseWithFraction(inchesStr);
+                    }
+                }
+            }
+            else
+            {
+                // Just inches (possibly with fraction)
+                value = parseWithFraction(text);
+            }
+            return value * INCH_TO_MM;
+        }
+        return text.toDouble();
+    };
+
+    // Helper lambda for displaying length values (converts from mm to display units)
+    auto displayLength = [this](double mmValue) -> QString {
+        if (m_useInches)
+            return QString::number(mmValue / INCH_TO_MM, 'f', 2);
+        return QString::number(mmValue);
+    };
+
     /** Get sail type and cut. */
     saildef->sailCut = getSailCut();
     saildef->sailType = getSailType();
@@ -356,7 +498,7 @@ bool CFormSailDef::check()
     saildef->sailID = txt.toStdString();
 
     /** Get and check length of boat. */
-    saildef->LOA = txtLOA->text().toDouble();
+    saildef->LOA = readLength(txtLOA);
 
     if (saildef->LOA < 100)
     {
@@ -374,11 +516,11 @@ bool CFormSailDef::check()
     {
         txtLOA->setPalette(palStd);
     }
-    txtLOA->setText(QString::number(saildef->LOA));
+    txtLOA->setText(displayLength(saildef->LOA));
     L1 = (long)(saildef->LOA);
 
     /** Get and check foretriangle base against boat length. */
-    saildef->foreJ = txtTriangBase->text().toDouble();
+    saildef->foreJ = readLength(txtTriangBase);
 
     if (saildef->foreJ > 0.9* L1)
     {
@@ -399,10 +541,10 @@ bool CFormSailDef::check()
         txtTriangBase->setPalette(palStd);
         txtLOA->setPalette(palStd);
     }
-    txtTriangBase->setText(QString::number(saildef->foreJ));
+    txtTriangBase->setText(displayLength(saildef->foreJ));
 
     /** Get and check foretriangle hoist against boat length */
-    saildef->foreI = txtTriangHoist->text().toDouble();
+    saildef->foreI = readLength(txtTriangHoist);
 
     if (saildef->foreI > 4*L1)
     {
@@ -423,12 +565,12 @@ bool CFormSailDef::check()
         txtTriangBase->setPalette(palStd);
         txtLOA->setPalette(palStd);
     }
-    txtTriangHoist->setText(QString::number(saildef->foreI));
+    txtTriangHoist->setText(displayLength(saildef->foreI));
 
     /** Check tack position function of boat length. */
     L1 = (long)(saildef->LOA);
 
-    saildef->tackX  = txtTackDist->text().toDouble();
+    saildef->tackX  = readLength(txtTackDist);
     if (saildef->tackX > 0.9*L1)
     {
         flag = false;
@@ -441,12 +583,12 @@ bool CFormSailDef::check()
         txtTackDist->setPalette(palStd);
         txtLOA->setPalette(palStd);
     }
-    txtTackDist->setText(QString::number(saildef->tackX));
+    txtTackDist->setText(displayLength(saildef->tackX));
 
-    saildef->tackY  = txtTackHeight->text().toDouble();
+    saildef->tackY  = readLength(txtTackHeight);
     L1 = (long)(saildef->foreI);
 
-    saildef->tackY  = txtTackHeight->text().toDouble();
+    saildef->tackY  = readLength(txtTackHeight);
     if (saildef->tackY > 0.5*L1)
     {
         flag = false;
@@ -459,27 +601,27 @@ bool CFormSailDef::check()
         txtTackHeight->setPalette(palStd);
         txtTriangHoist->setPalette(palStd);
     }
-    txtTackHeight->setText(QString::number(saildef->tackY));
+    txtTackHeight->setText(displayLength(saildef->tackY));
 
     /** Get length and round data of the 4 sides of sail. */
-    saildef->luffL  = txtLuffLen->text().toDouble();
-    saildef->luffR  = txtLuffRound->text().toDouble();
+    saildef->luffL  = readLength(txtLuffLen);
+    saildef->luffR  = readLength(txtLuffRound);
     saildef->luffRP = txtLuffRoundPos->text().toInt();
 
     saildef->gaffDeg = txtGaffAngle->text().toDouble();
-    saildef->gaffL  = txtGaffLen->text().toDouble();
-    saildef->gaffR  = txtGaffRound->text().toDouble();
+    saildef->gaffL  = readLength(txtGaffLen);
+    saildef->gaffR  = readLength(txtGaffRound);
 
-    saildef->leechL = txtLeechLen->text().toDouble();
-    saildef->leechR = txtLeechRound->text().toDouble();
+    saildef->leechL = readLength(txtLeechLen);
+    saildef->leechR = readLength(txtLeechRound);
     saildef->leechRP = txtLeechRoundPos->text().toInt();
 
-    saildef->footL  = txtFootLen->text().toDouble();
-    saildef->footR  = txtFootRound->text().toDouble();
+    saildef->footL  = readLength(txtFootLen);
+    saildef->footR  = readLength(txtFootRound);
     saildef->footRP = 50; // imposed value
 
     /** Check luff rake. */
-    saildef->rake   = txtRake->text().toDouble();
+    saildef->rake   = readLength(txtRake);
 
     switch (saildef->sailType )
     {
@@ -501,7 +643,7 @@ bool CFormSailDef::check()
         {
             txtRake->setPalette(palStd);
         }
-        txtRake->setText(QString::number(saildef->rake));
+        txtRake->setText(displayLength(saildef->rake));
         break;
 
     default:
@@ -525,7 +667,7 @@ bool CFormSailDef::check()
             txtRake->setPalette(palStd);
             txtTriangHoist->setPalette(palStd);
         }
-        txtRake->setText(QString::number(saildef->rake));
+        txtRake->setText(displayLength(saildef->rake));
         break;
     }
 
@@ -556,7 +698,7 @@ bool CFormSailDef::check()
             txtTriangHoist->setPalette(palStd);
             txtLuffLen->setPalette(palStd);
         }
-        txtLuffLen->setText(QString::number(saildef->luffL));
+        txtLuffLen->setText(displayLength(saildef->luffL));
 
         /** check luff round against luff length */
         L2 =(long) ((saildef->luffL ) / 10); // luff round limit
@@ -577,7 +719,7 @@ bool CFormSailDef::check()
         {
             txtLuffRound->setPalette(palStd);
         }
-        txtLuffRound->setText(QString::number(saildef->luffR) );
+        txtLuffRound->setText(displayLength(saildef->luffR));
 
         /** check main sail foot length against Luff*/
         L2 = (long)(saildef->luffL) * 1.5;
@@ -597,7 +739,7 @@ bool CFormSailDef::check()
         {
             txtFootLen->setPalette(palStd);
         }
-        txtFootLen->setText(QString::number(saildef->footL));
+        txtFootLen->setText(displayLength(saildef->footL));
 
         /** Check main sail gaff length against foot */
         L1 =(long) (5);
@@ -619,7 +761,7 @@ bool CFormSailDef::check()
         {
             txtGaffLen->setPalette(palStd);
         }
-        txtGaffLen->setText(QString::number(saildef->gaffL) );
+        txtGaffLen->setText(displayLength(saildef->gaffL));
 
         /** Check main sail gaff round. */
         L1 = (long) ((saildef->gaffL )/ 8);
@@ -640,7 +782,7 @@ bool CFormSailDef::check()
         {
             txtGaffRound->setPalette(palStd);
         }
-        txtGaffRound->setText(QString::number(saildef->gaffR) );
+        txtGaffRound->setText(displayLength(saildef->gaffR));
 
         break;
 
@@ -667,7 +809,7 @@ bool CFormSailDef::check()
             txtTackHeight->setPalette(palStd);
             txtLuffLen->setPalette(palStd);
         }
-        txtLuffLen->setText(QString::number(saildef->luffL) );
+        txtLuffLen->setText(displayLength(saildef->luffL));
 
         L2 = (long) ((saildef->luffL )/ 10); // round limit
         /** To accommodate code zero jib
@@ -689,7 +831,7 @@ bool CFormSailDef::check()
         {
             txtLuffRound->setPalette(palStd);
         }
-        txtLuffRound->setText(QString::number(saildef->luffR) );
+        txtLuffRound->setText(displayLength(saildef->luffR));
 
         /** Check jib gaff length. */
         L1 =(long) (1);
@@ -711,20 +853,20 @@ bool CFormSailDef::check()
         {
             txtGaffLen->setPalette(palStd);
         }
-        txtGaffLen->setText(QString::number(saildef->gaffL) );
+        txtGaffLen->setText(displayLength(saildef->gaffL) );
 
         // reset gaff round
         txtGaffRound->setPalette(palStd);
-        txtGaffRound->setText(QString::number(0) );
+        txtGaffRound->setText(displayLength(0) );
 
         break;
 
     case WING:
         /** For a wing set gaff length to minimum. */
         saildef->gaffL = 2;
-        txtGaffLen->setText(QString::number(saildef->gaffL) );
+        txtGaffLen->setText(displayLength(saildef->gaffL) );
         saildef->gaffR = 0;
-        txtGaffRound->setText(QString::number(saildef->gaffR) );
+        txtGaffRound->setText(displayLength(saildef->gaffR) );
 
         // check gaff angle and set it to be horizontal
         A1 = saildef->rake / saildef->luffL;
@@ -736,7 +878,7 @@ bool CFormSailDef::check()
         A2 = saildef->luffL * sin(degreesToRadians(saildef->gaffDeg));
 
         saildef->leechL = floor(sqrt( A1*A1 + A2*A2 ) );
-        txtLeechLen->setText(QString::number(saildef->leechL) );
+        txtLeechLen->setText(displayLength(saildef->leechL) );
 
         L2 =(long) ((saildef->luffL )/ 4); // wing luff round limit
 
@@ -756,7 +898,7 @@ bool CFormSailDef::check()
         {
             txtLuffRound->setPalette(palStd);
         }
-        txtLuffRound->setText(QString::number(saildef->luffR) );
+        txtLuffRound->setText(displayLength(saildef->luffR) );
 
         break;
     }
@@ -796,7 +938,7 @@ bool CFormSailDef::check()
         txtLuffLen->setPalette(palStd);
         txtLeechLen->setPalette(palStd);
     }
-    txtLeechLen->setText(QString::number(saildef->leechL));
+    txtLeechLen->setText(displayLength(saildef->leechL));
 
     /** Check leech round. */
     L1 = (long) int(saildef->leechL / 10);
@@ -864,7 +1006,7 @@ bool CFormSailDef::check()
         txtLeechLen->setPalette( palStd );
         txtFootLen->setPalette( palStd );
     }
-    txtFootLen->setText( QString::number( saildef->footL ) );
+    txtFootLen->setText( displayLength( saildef->footL ) );
 
     /** Check foot round value. */
     L1 = (long)(saildef->footL / 5);
@@ -873,7 +1015,7 @@ bool CFormSailDef::check()
     {
     case WING:
         saildef->footR = 0;
-        txtFootRound->setText(QString::number(saildef->footR));
+        txtFootRound->setText(displayLength(saildef->footR));
         break;
 
     default:
@@ -897,16 +1039,16 @@ bool CFormSailDef::check()
             txtFootLen->setPalette( palStd );
             txtFootRound->setPalette(palStd );
         }
-        txtFootRound->setText(QString::number(saildef->footR));
+        txtFootRound->setText(displayLength(saildef->footR));
         break;
     }
 
     /** Get cloth, seams and hems width. */
-    saildef->clothW = txtClothWidth->text().toDouble();
-    saildef->seamW  = txtSeamWidth->text().toDouble();
-    saildef->leechHemW = txtLeechHemWidth->text().toDouble();
-    saildef->footHemW = txtFootHemWidth->text().toDouble();
-    saildef->hemsW = txtHemsWidth->text().toDouble();
+    saildef->clothW = readLength(txtClothWidth);
+    saildef->seamW  = readLength(txtSeamWidth);
+    saildef->leechHemW = readLength(txtLeechHemWidth);
+    saildef->footHemW = readLength(txtFootHemWidth);
+    saildef->hemsW = readLength(txtHemsWidth);
 
     /** Check cloth width against Leech length to ensure min/max number of panels. */
     if (saildef->clothW < saildef->leechL /100) // max 100 panels
@@ -925,7 +1067,7 @@ bool CFormSailDef::check()
     {
         txtClothWidth->setPalette(palStd);
     }
-    txtClothWidth->setText( QString::number(saildef->clothW));
+    txtClothWidth->setText( displayLength(saildef->clothW));
 
     L1 = (long)(5+ int(saildef->clothW / 10));
 
@@ -946,7 +1088,7 @@ bool CFormSailDef::check()
     {
         txtSeamWidth->setPalette( palStd);
     }
-    txtSeamWidth->setText( QString::number(saildef->seamW));
+    txtSeamWidth->setText( displayLength(saildef->seamW));
 
     /** Check leech hem width function of cloth width. */
     if (saildef->leechHemW > L1*2)
@@ -965,7 +1107,7 @@ bool CFormSailDef::check()
     {
         txtLeechHemWidth->setPalette( palStd);
     }
-    txtLeechHemWidth->setText( QString::number(saildef->leechHemW));
+    txtLeechHemWidth->setText( displayLength(saildef->leechHemW));
 
     /** Check foot hem width function of cloth width. */
     if (saildef->footHemW > L1*2)
@@ -984,7 +1126,7 @@ bool CFormSailDef::check()
     {
         txtFootHemWidth->setPalette( palStd);
     }
-    txtFootHemWidth->setText( QString::number(saildef->footHemW));
+    txtFootHemWidth->setText( displayLength(saildef->footHemW));
 
     /** Check other luff and gaff hem width function of cloth width. */
     if (saildef->hemsW > L1)
@@ -1003,7 +1145,7 @@ bool CFormSailDef::check()
     {
         txtHemsWidth->setPalette( palStd);
     }
-    txtHemsWidth->setText( QString::number(saildef->hemsW));
+    txtHemsWidth->setText( displayLength(saildef->hemsW));
 
 
     /** Get the mould data. */
@@ -1177,37 +1319,50 @@ void CFormSailDef::slotCompute()
 
     CSailWorker worker(*saildef);
 
-    txta = tr("Sail corners coordinates");
-    txta = txta+"\n  "+tr("tack")+" \t x = "+QString::number(int(worker.tack.x())) +"\n\t y = "+QString::number(int(worker.tack.y())) +" mm";
-    txta = txta+"\n  "+tr("clew")+" \t x = "+QString::number(int(worker.clew.x())) +"\n\t y = "+QString::number(int(worker.clew.y())) +" mm";
-    txta = txta+"\n  "+tr("head")+" \t x = "+QString::number(int(worker.head.x())) +"\n\t y = "+QString::number(int(worker.head.y())) +" mm";
-    txta = txta+"\n  "+tr("peak")+" \t x = "+QString::number(int(worker.peak.x())) +"\n\t y = "+QString::number(int(worker.peak.y())) +" mm";
+    // Unit label and conversion factor for display
+    QString unitLabel = m_useInches ? "in" : "mm";
+    double displayFactor = m_useInches ? (1.0 / INCH_TO_MM) : 1.0;
+
+    // Helper lambda for displaying coordinate values
+    auto displayCoord = [displayFactor, this](real mmValue) -> QString {
+        double value = mmValue * displayFactor;
+        if (m_useInches)
+            return QString::number(value, 'f', 1);
+        else
+            return QString::number(int(value));
+    };
+
+    txta = tr("Sail Corners Coordinates");
+    txta = txta+"\n  "+tr("Tack")+" \t x = "+displayCoord(worker.tack.x()) +"\n\t y = "+displayCoord(worker.tack.y()) +" " + unitLabel;
+    txta = txta+"\n  "+tr("Clew")+" \t x = "+displayCoord(worker.clew.x()) +"\n\t y = "+displayCoord(worker.clew.y()) +" " + unitLabel;
+    txta = txta+"\n  "+tr("Head")+" \t x = "+displayCoord(worker.head.x()) +"\n\t y = "+displayCoord(worker.head.y()) +" " + unitLabel;
+    txta = txta+"\n  "+tr("Peak")+" \t x = "+displayCoord(worker.peak.x()) +"\n\t y = "+displayCoord(worker.peak.y()) +" " + unitLabel;
 
     w = worker.SailLP();
-    txtb = "\nLP = " +QString::number(int(w)) +" mm ";
+    txtb = "\nLP = " +displayCoord(w) +" " + unitLabel + " ";
 
-    txtc = "\n" + tr("Sail width measurements ");
+    txtc = "\n" + tr("Sail Width Measurements ");
     h=0.875;
     w = worker.IRCwidth(h);
     w1 = worker.SailWidth(h);
     // printf ("h=%f IRC width=%f IOR width=%f \n", h, w, w1);
-    txtc = txtc +"\n  h= " +QString::number(h)+"\t IRC w= " +QString::number(int(w)) +" mm \t IOR w= " +QString::number(int(w1)) +" mm";
+    txtc = txtc +"\n  h= " +QString::number(h)+"\t IRC w= " +displayCoord(w) +" " + unitLabel + " \t IOR w= " +displayCoord(w1) +" " + unitLabel;
 
     h=0.75;
     w = worker.IRCwidth(h);
     w1 = worker.SailWidth(h);
     // printf ("h=%f IRC width=%f IOR width=%f \n", h, w, w1);
-    txtc = txtc+ "\n  h= " +QString::number(h)+"\t IRC w= " +QString::number(int(w)) +" mm \t IOR w= " +QString::number(int(w1)) +" mm";
+    txtc = txtc+ "\n  h= " +QString::number(h)+"\t IRC w= " +displayCoord(w) +" " + unitLabel + " \t IOR w= " +displayCoord(w1) +" " + unitLabel;
 
     h=0.5;
     w = worker.IRCwidth(h);
     w1 = worker.SailWidth(h);
-    txtc = txtc  + "\n  h= "+QString::number(h)+"\t IRC w= "+QString::number(int(w)) +" mm \t IOR w= " +QString::number(int(w1)) +" mm";
+    txtc = txtc  + "\n  h= "+QString::number(h)+"\t IRC w= "+displayCoord(w) +" " + unitLabel + " \t IOR w= " +displayCoord(w1) +" " + unitLabel;
 
     h=0.25;
     w = worker.IRCwidth(h);
     w1 = worker.SailWidth(h);
-    txtc = txtc  + "\n  h= "+QString::number(h)+"\t IRC w= "+QString::number(int(w)) +" mm \t IOR w= " +QString::number(int(w1)) +" mm";
+    txtc = txtc  + "\n  h= "+QString::number(h)+"\t IRC w= "+displayCoord(w) +" " + unitLabel + " \t IOR w= " +displayCoord(w1) +" " + unitLabel;
 
     // Display ancillary data in a message box.
     QMessageBox::information(this, "Sailcut", txta + "\n" + txtb + "\n" + txtc + "\n" + txtd + "\n" + txte);

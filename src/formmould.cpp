@@ -38,7 +38,7 @@ CFormMould::CFormMould( QWidget *parent, CSailMould *mouldptr )
         : QDialog(parent)
 {
     setModal(true);
-    setWindowTitle( tr( "Sail mould" ) );
+    setWindowTitle( tr( "Sail Mould" ) );
 
     // we store the pointer to the CSailMould so we can update it when
     // the user clicks OK
@@ -62,7 +62,7 @@ CFormMould::CFormMould( QWidget *parent, CSailMould *mouldptr )
     CFormMouldLayout->addLayout( buttonsLayout, 1, 1 );
 
     // add vertical repartition
-    widgetVert = new CWidgetProfileVert( this, sailmould, tr("Vertical repartition") );
+    widgetVert = new CWidgetProfileVert( this, sailmould, tr("Vertical Repartition") );
 
     CFormMouldLayout->addWidget( widgetVert, 0, 0 );
 
@@ -73,9 +73,9 @@ CFormMould::CFormMould( QWidget *parent, CSailMould *mouldptr )
     QGridLayout* frmProfileLayout = new QGridLayout( frmProfile );
     CFormMouldLayout->addWidget( frmProfile, 0, 1 );
 
-    prfTop = new CWidgetProfile( frmProfile, &sailmould->profile[2], tr("Top profile"), widgetVert );
-    prfMiddle = new CWidgetProfile( frmProfile, &sailmould->profile[1], tr("Middle profile"), widgetVert );
-    prfBottom = new CWidgetProfile( frmProfile, &sailmould->profile[0], tr("Bottom profile"), widgetVert );
+    prfTop = new CWidgetProfile( frmProfile, &sailmould->profile[2], tr("Top Profile"), widgetVert );
+    prfMiddle = new CWidgetProfile( frmProfile, &sailmould->profile[1], tr("Middle Profile"), widgetVert );
+    prfBottom = new CWidgetProfile( frmProfile, &sailmould->profile[0], tr("Bottom Profile"), widgetVert );
 
     frmProfileLayout->addWidget( prfTop, 0, 0 );
     frmProfileLayout->addWidget( prfMiddle, 1, 0 );

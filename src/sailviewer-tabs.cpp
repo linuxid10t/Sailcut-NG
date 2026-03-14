@@ -58,8 +58,8 @@ void CSailViewerTabs::addViewer(CSailViewerPanel *viewer)
 void CSailViewerTabs::languageChange()
 {
     int tabidx = 0;
-    setTabText(tabidx++, tr("shaded view"));
-    setTabText(tabidx++, tr("wireframe view"));
+    setTabText(tabidx++, tr("Shaded View"));
+    setTabText(tabidx++, tr("Wireframe View"));
 }
 
 

@@ -162,6 +162,27 @@ void CSailApp::setWindowSize(const QSize &size)
 
 
 /**
+ * Returns whether inches are used for display.
+ */
+bool CSailApp::useInches() const
+{
+    return prefs.useInches;
+}
+
+
+/**
+ * Sets whether inches are used for display.
+ */
+void CSailApp::setUseInches(bool useInches)
+{
+    if (useInches != prefs.useInches) {
+        prefs.useInches = useInches;
+        emit useInchesChanged();
+    }
+}
+
+
+/**
  * Loads translation strings for a given language.
  */
 void CSailApp::loadTranslation(const QString locale)
@@ -269,6 +290,7 @@ void CSailApp::readPrefs()
                 emit recentDocumentsChanged();
             }
             setWindowSize(QSize(newPrefs.mainWindowWidth, newPrefs.mainWindowHeight));
+            setUseInches(newPrefs.useInches);
         }
     }
     catch (read_error const&)

@@ -61,6 +61,7 @@ private slots:
     void slotSaveAs();
 
     void slotLanguage();
+    void slotPreferences();
 
     void languageChange();
     void recentDocumentsChanged();
@@ -84,6 +85,8 @@ private:
     QMenu *menuFile;
     /** The New submenu */
     QMenu *menuFileNew;
+    /** The Edit menu */
+    QMenu *menuEdit;
     /** The Help menu */
     QMenu *menuHelp;
     /** The View menu */
@@ -119,6 +122,9 @@ private:
     QAction *actionSaveAs;
     /** Final separator in the 'File' menu before 'Quit' */
     QAction *actionFileSep;
+
+    /** Open preferences dialog */
+    QAction *actionPreferences;
 
     /** View the sail definition */
     QAction *actionViewDef;

@@ -46,6 +46,7 @@ HEADERS += \
     formmain.h \
     formmould.h \
     formpanelgroup.h \
+    formprefs.h \
     formprint.h \
     formrigdef.h \
     formrig.h \
@@ -97,6 +98,7 @@ SOURCES += \
     formmain.cpp \
     formmould.cpp \
     formpanelgroup.cpp \
+    formprefs.cpp \
     formprint.cpp \
     formrig.cpp \
     formrigdef.cpp \

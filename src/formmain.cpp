@@ -27,6 +27,7 @@
 #include "formrig.h"
 #include "formpanelgroup.h"
 #include "formboat.h"
+#include "formprefs.h"
 
 #include "sailcut.xpm"
 
@@ -98,16 +99,20 @@ void CFormMain::languageChange()
     menuFile->setTitle( tr("&File") );
 
     menuFileNew->setTitle( tr("&New") );
-    actionNewSail->setText( tr("sail") );
-    actionNewHull->setText( tr("hull") );
-    actionNewRig->setText( tr("rig") );
-    actionNewBoat->setText( tr("boat") );
+    actionNewSail->setText( tr("Sail") );
+    actionNewHull->setText( tr("Hull") );
+    actionNewRig->setText( tr("Rig") );
+    actionNewBoat->setText( tr("Boat") );
     actionOpen->setText( tr("&Open") );
-    menuRecent->setTitle( tr("Open &recent") );
+    menuRecent->setTitle( tr("Open &Recent") );
     actionSave->setText( tr("&Save") );
     actionSaveAs->setText( tr("Save &As") );
 
     actionQuit->setText( tr("&Quit") );
+
+    // Edit menu
+    menuEdit->setTitle( tr("&Edit") );
+    actionPreferences->setText( tr("&Preferences") );
 
     // View menu
     menuView->setTitle( tr("&View") );
@@ -124,12 +129,12 @@ void CFormMain::languageChange()
 bool CFormMain::load(const QString &filename)
 {
     if (read(filename)) {
-        statusbar->showMessage(tr("loaded '%1'").arg(filename));
+        statusbar->showMessage(tr("Loaded '%1'").arg(filename));
         app->addRecentDocument(filename);
         this->filename = filename;
         return true;
     } else {
-        statusbar->showMessage( tr("error loading '%1'").arg(filename) );
+        statusbar->showMessage( tr("Error loading '%1'").arg(filename) );
         app->removeRecentDocument(filename);
         return false;
     }
@@ -166,6 +171,10 @@ void CFormMain::setupMenuBar()
     actionSaveAs = menuFile->addAction("", this, SLOT( slotSaveAs() ) );
     actionFileSep = menuFile->addSeparator();
     actionQuit = menuFile->addAction( "", this, SLOT( close() ) );
+
+    // Edit menu
+    menuEdit = menuBar()->addMenu("");
+    actionPreferences = menuEdit->addAction("", this, SLOT( slotPreferences() ) );
 
     // View menu
     menuView = menuBar()->addMenu("");
@@ -287,10 +296,10 @@ void CFormMain::slotSave()
     }
 
     if (write(filename)) {
-        statusbar->showMessage(tr("wrote '%1'").arg(filename));
+        statusbar->showMessage(tr("Wrote '%1'").arg(filename));
         app->addRecentDocument(filename);
     } else {
-        QMessageBox::information(0, tr("error"), tr("There was an error writing to the selected file."));
+        QMessageBox::information(0, tr("Error"), tr("There was an error writing to the selected file."));
     }
 }
 
@@ -306,9 +315,19 @@ void CFormMain::slotSaveAs()
 
     if (write(newfilename)) {
         filename = newfilename;
-        statusbar->showMessage(tr("wrote '%1'").arg(filename));
+        statusbar->showMessage(tr("Wrote '%1'").arg(filename));
         app->addRecentDocument(filename);
     } else {
-        QMessageBox::information(0, tr("error"), tr("There was an error writing to the selected file."));
+        QMessageBox::information(0, tr("Error"), tr("There was an error writing to the selected file."));
     }
+}
+
+
+/**
+ * Opens the preferences dialog.
+ */
+void CFormMain::slotPreferences()
+{
+    CFormPrefs dlg(this);
+    dlg.exec();
 }
