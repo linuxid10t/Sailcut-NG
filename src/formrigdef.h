@@ -22,6 +22,9 @@
 #include "ui_formrigdefbase.h"
 #include "sailcpp/rigdef.h"
 
+/** Conversion factor from inches to millimeters */
+static const double INCH_TO_MM = 25.4;
+
 
 /** The rig definition dialog, where the user enters
  *  the parameters of the rig.
@@ -47,6 +50,8 @@ private slots:
 protected:
     /** a pointer to the rig definion */
     CRigDef *rigdef;
+    /** whether the UI should display inches instead of millimetres */
+    bool m_useInches = false; // default mm
 
 };
 

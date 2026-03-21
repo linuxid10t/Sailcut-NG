@@ -23,6 +23,7 @@
 #include <QLineEdit>
 
 #include "formhulldef.h"
+#include "app.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -43,13 +44,31 @@ CFormHullDef::CFormHullDef( QWidget* parent, CHullDef * hullptr )
        the user clicks OK */
     hulldef = hullptr;
 
+    // Get unit preference
+    CSailApp *app = qobject_cast<CSailApp*>(qApp);
+    m_useInches = app->useInches();
+
+    // Helper lambda for displaying length values
+    auto displayLength = [this](double mmValue) -> QString {
+        if (m_useInches)
+            return QString::number(mmValue / INCH_TO_MM, 'f', 2);
+        else
+            return QString::number(mmValue);
+    };
+
+    // Update the unit label at the top of the dialog
+    if (m_useInches)
+        label->setText(tr("Dimensions are in inches (or ft'in\") and angles in degrees measured from horizontal"));
+    else
+        label->setText(tr("Dimensions are in millimeters and angles in degrees measured from horizontal"));
+
     txt_HullID->setText(QString::fromStdString(hulldef->hullID));
     /// deck parameters
-    txt_BLWL->setText( QString::number(hulldef->BLWL) );
-    txt_DfwdHeight->setText( QString::number(hulldef->DfwdHeight) );
-    txt_DaftHeight->setText( QString::number(hulldef->DaftHeight) );
-    txt_BBW->setText( QString::number(hulldef->BBW) );
-    txt_BaftW->setText( QString::number(hulldef->BaftW) );
+    txt_BLWL->setText( displayLength(hulldef->BLWL) );
+    txt_DfwdHeight->setText( displayLength(hulldef->DfwdHeight) );
+    txt_DaftHeight->setText( displayLength(hulldef->DaftHeight) );
+    txt_BBW->setText( displayLength(hulldef->BBW) );
+    txt_BaftW->setText( displayLength(hulldef->BaftW) );
     spinBox_BSlopeA->setValue(hulldef->BSlopeA);
     spinBox_BBWPos->setValue(hulldef->BBWPos);
 
@@ -60,8 +79,8 @@ CFormHullDef::CFormHullDef( QWidget* parent, CHullDef * hullptr )
     spinBox_BaftShape->setValue(hulldef->BaftShape);
 
     /// bottom parameters
-    txt_BfwdHeight->setText( QString::number(hulldef->BfwdHeight) );
-    txt_BaftHeight->setText( QString::number(hulldef->BaftHeight) );
+    txt_BfwdHeight->setText( displayLength(hulldef->BfwdHeight) );
+    txt_BaftHeight->setText( displayLength(hulldef->BaftHeight) );
     spinBox_BSlopeA->setValue(hulldef->BSlopeA);
     spinBox_BDeadriseA->setValue(hulldef->BDeadriseA);
     spinBox_BSweepA->setValue(hulldef->BSweepA);
@@ -132,6 +151,89 @@ bool CFormHullDef::check()
     palHi.setColor( QPalette::Text, Qt::red );    // too high value
     palRel.setColor( QPalette::Text, Qt::blue );  // related value to be checked
 
+    // Helper lambda for displaying length values (converts from mm to display units)
+    auto displayLength = [this](double mmValue) -> QString {
+        if (m_useInches)
+            return QString::number(mmValue / INCH_TO_MM, 'f', 2);
+        else
+            return QString::number(mmValue);
+    };
+
+    // Helper lambda for reading length values (converts from display units to mm)
+    // Supports fractional inch input like "25 1/2" for 25.5 inches
+    auto readLength = [this](const QLineEdit *edit) -> double {
+        QString text = edit->text().simplified();
+        double value = 0.0;
+
+        if (m_useInches)
+        {
+            // Helper to parse a number that might include a fraction
+            auto parseWithFraction = [](const QString& str) -> double {
+                double val = 0.0;
+                QStringList parts = str.split(' ', Qt::SkipEmptyParts);
+                if (parts.size() == 2)
+                {
+                    // Whole number + fraction
+                    val = parts[0].toDouble();
+                    QStringList fractionParts = parts[1].split('/');
+                    if (fractionParts.size() == 2)
+                    {
+                        double numerator = fractionParts[0].toDouble();
+                        double denominator = fractionParts[1].toDouble();
+                        if (denominator != 0)
+                            val += numerator / denominator;
+                    }
+                }
+                else if (parts.size() == 1)
+                {
+                    if (str.contains('/'))
+                    {
+                        QStringList fractionParts = str.split('/');
+                        if (fractionParts.size() == 2)
+                        {
+                            double numerator = fractionParts[0].toDouble();
+                            double denominator = fractionParts[1].toDouble();
+                            if (denominator != 0)
+                                val = numerator / denominator;
+                        }
+                    }
+                    else
+                    {
+                        val = str.toDouble();
+                    }
+                }
+                return val;
+            };
+
+            // Check for feet'inches format (e.g., "5'3\"" or "5'3 1/2")
+            if (text.contains('\''))
+            {
+                QStringList feetInches = text.split('\'');
+                if (feetInches.size() >= 1)
+                {
+                    // Feet part
+                    value = feetInches[0].toDouble() * 12.0;
+                    // Inches part (if present)
+                    if (feetInches.size() >= 2)
+                    {
+                        // Remove trailing " if present
+                        QString inchesStr = feetInches[1];
+                        if (inchesStr.endsWith('"'))
+                            inchesStr.chop(1);
+                        value += parseWithFraction(inchesStr);
+                    }
+                }
+            }
+            else
+            {
+                // Just inches (possibly with fraction)
+                value = parseWithFraction(text);
+            }
+            return value * INCH_TO_MM;
+        }
+        return text.toDouble();
+    };
+
     /// check hull ID
     txt = txt_HullID->text();
     txt = txt.simplified();
@@ -150,7 +252,7 @@ bool CFormHullDef::check()
     hulldef->hullID = txt.toStdString();
 
     /// check bottom data
-    hulldef->BLWL = txt_BLWL->text().toDouble(); // length waterline
+    hulldef->BLWL = readLength(txt_BLWL); // length waterline
 
     if (hulldef->BLWL < 100)
     {
@@ -168,11 +270,11 @@ bool CFormHullDef::check()
     {
         txt_BLWL->setPalette(palStd);
     }
-    txt_BLWL->setText(QString::number(hulldef->BLWL));
+    txt_BLWL->setText(displayLength(hulldef->BLWL));
     L1 = (long)(hulldef->BLWL);
 
     // lower chine height
-    hulldef->BfwdHeight = txt_BfwdHeight->text().toDouble();
+    hulldef->BfwdHeight = readLength(txt_BfwdHeight);
     if (hulldef->BfwdHeight > L1/5)
     {
         flag = false;
@@ -183,9 +285,9 @@ bool CFormHullDef::check()
     {
         txt_BfwdHeight->setPalette(palStd);
     }
-    txt_BfwdHeight->setText(QString::number(hulldef->BfwdHeight));
+    txt_BfwdHeight->setText(displayLength(hulldef->BfwdHeight));
 
-    hulldef->BaftHeight = txt_BaftHeight->text().toDouble();
+    hulldef->BaftHeight = readLength(txt_BaftHeight);
     if (hulldef->BaftHeight > L1 / 5)
     {
         flag = false;
@@ -196,10 +298,10 @@ bool CFormHullDef::check()
     {
         txt_BaftHeight->setPalette(palStd);
     }
-    txt_BaftHeight->setText(QString::number(hulldef->BaftHeight));
+    txt_BaftHeight->setText(displayLength(hulldef->BaftHeight));
 
     // bottom width
-    hulldef->BBW = txt_BBW->text().toDouble();
+    hulldef->BBW = readLength(txt_BBW);
     if (hulldef->BBW < L1/20)
     {
         flag = false;
@@ -216,9 +318,9 @@ bool CFormHullDef::check()
     {
         txt_BBW->setPalette(palStd);
     }
-    txt_BBW->setText(QString::number(hulldef->BBW));
+    txt_BBW->setText(displayLength(hulldef->BBW));
 
-    hulldef->BaftW = txt_BaftW->text().toDouble();
+    hulldef->BaftW = readLength(txt_BaftW);
     if (hulldef->BaftW < 0)
     {
         flag = false;
@@ -235,7 +337,7 @@ bool CFormHullDef::check()
     {
         txt_BaftW->setPalette(palStd);
     }
-    txt_BaftW->setText(QString::number(hulldef->BaftW));
+    txt_BaftW->setText(displayLength(hulldef->BaftW));
 
     hulldef->BBWPos = spinBox_BBWPos->value();
 
@@ -251,7 +353,7 @@ bool CFormHullDef::check()
     hulldef->TransomA = spinBox_TransomA->value();
 
     /// check deck data
-    hulldef->DfwdHeight = txt_DfwdHeight->text().toDouble();
+    hulldef->DfwdHeight = readLength(txt_DfwdHeight);
     if (hulldef->DfwdHeight < (hulldef->BfwdHeight + L1 / 20) )
     {
         flag = false;
@@ -268,9 +370,9 @@ bool CFormHullDef::check()
     {
         txt_DfwdHeight->setPalette(palStd);
     }
-    txt_DfwdHeight->setText(QString::number(hulldef->DfwdHeight));
+    txt_DfwdHeight->setText(displayLength(hulldef->DfwdHeight));
 
-    hulldef->DaftHeight = txt_DaftHeight->text().toDouble();
+    hulldef->DaftHeight = readLength(txt_DaftHeight);
     if (hulldef->DaftHeight < (hulldef->BaftHeight + L1 / 20) )
     {
         flag = false;
@@ -287,7 +389,7 @@ bool CFormHullDef::check()
     {
         txt_DaftHeight->setPalette(palStd);
     }
-    txt_DaftHeight->setText(QString::number(hulldef->DaftHeight));
+    txt_DaftHeight->setText(displayLength(hulldef->DaftHeight));
 
     /// planking parameters
     hulldef->NBPlank = spinBox_NBPlank->value();

@@ -97,4 +97,13 @@ When using inches mode, the following input formats are supported:
 - **Feet and inches**: `5'3` or `5'3"`
 - **Feet and inches with fraction**: `5'3 1/2`
 
-The input parsing is handled in `formsaildef.cpp` in the `readLength` lambda function.
+The input parsing is handled in `formsaildef.cpp`, `formhulldef.cpp`, and `formrigdef.cpp` via the `readLength` lambda function.
+
+### Supported Dialogs
+
+Imperial units are fully supported in:
+- **Sail Dimensions** (`formsaildef.cpp/h`) - All sail dimension inputs and computed outputs
+- **Hull Dimensions** (`formhulldef.cpp/h`) - All hull dimension inputs with validation
+- **Rig Dimensions** (`formrigdef.cpp/h`) - All rig dimension inputs with validation
+
+Each dialog dynamically updates its header label to indicate the current unit system (mm or inches).

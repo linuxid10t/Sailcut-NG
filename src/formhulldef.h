@@ -22,6 +22,9 @@
 #include "ui_formhulldefbase.h"
 #include "sailcpp/hulldef.h"
 
+/** Conversion factor from inches to millimeters */
+static const double INCH_TO_MM = 25.4;
+
 
 /** The hull definition dialog, where the user enters
  *  the parameters of the hull.
@@ -43,6 +46,8 @@ protected slots:
 protected:
     /** a pointer to the hull definion */
     CHullDef *hulldef;
+    /** whether the UI should display inches instead of millimetres */
+    bool m_useInches = false; // default mm
 
 };
 
